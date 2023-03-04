@@ -8,6 +8,7 @@ class Channel:
     youtube = build('youtube', 'v3', developerKey=api_key)  # специальный объект для работы с API
 
     def __init__(self, channel_id: str):
+        self._channel_id = None
         self.__channel_id = channel_id  # id канала
         self.channel = self.youtube.channels().list(id=channel_id,
                                                     part='snippet,statistics').execute()  # данные о канале
@@ -17,6 +18,32 @@ class Channel:
         self.subscribers = self.channel['items'][0]['statistics']['subscriberCount']  # количество подписчиков
         self.video_count = self.channel['items'][0]['statistics']['videoCount']  # количество видео
         self.view_count = self.channel['items'][0]['statistics']['viewCount']  # количество просмотров
+
+    def __repr__(self) -> str:
+        """Метод возвращает информацию о экземпляре класса для разработчика"""
+        return f'Youtube-канал: {self.title}, id: {self.__channel_id}, подписчиков: {self.subscribers}'
+
+    def __str__(self) -> str:
+        """Метод возвращает информацию о экземпляре класса для пользователей"""
+        return f'Youtube-канал: {self.title}, подписчиков: {self.subscribers}'
+
+    def __add__(self, other) -> int:
+        """Метод скадывает каналы по кол-ву количество подписчиков"""
+        if isinstance(other, Channel):
+            return int(self.subscribers) + int(other.subscribers)
+        else:
+            raise ValueError('Неправильный формат')
+
+    def __lt__(self, other) -> int:
+        """Метод сравнивает каналы по количеству подписчиков"""
+        if isinstance(other, Channel):
+            return self.subscribers > other.subscribers
+        else:
+            raise ValueError('Неправильный формат')
+
+    def __len__(self) -> int:
+        """Метод возвращает количество подписчиков канала"""
+        return int(self.subscribers)
 
     @property
     def channel_id(self):
@@ -48,4 +75,4 @@ class Channel:
 
     @channel_id.setter
     def channel_id(self, value):
-        self._channel_id = value
+        self.__channel_id = value
