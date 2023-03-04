@@ -46,12 +46,6 @@ class Channel:
         with open(filename, 'w', encoding='UTF-8') as file:
             json.dump(data, file, indent=2, ensure_ascii=False)
 
-
-#vdud = Channel('UCMCgOm8GZkHp8zJ6l7_hIuA')
-
-# print(vdud.title)
-# print(vdud.video_count)
-# print(vdud.url)
-# vdud.channel_id = 'new_id'
-#print(Channel.get_service())
-#vdud.record_to_json('vdud.json')
+    @channel_id.setter
+    def channel_id(self, value):
+        self._channel_id = value
