@@ -1,0 +1,75 @@
+Index: tests/conftest.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import pytest\r\nfrom src.Dataclass import Channel\r\n\r\n@pytest.fixture()\r\ndef channel1():\r\n    return Channel('UCMCgOm8GZkHp8zJ6l7_hIuA')\r\n\r\n@pytest.fixture()\r\ndef channel2():\r\n    return Channel('UC1eFXmJNkjITxPFWTy6RsWg')\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/tests/conftest.py b/tests/conftest.py
+--- a/tests/conftest.py	(revision cf5103ec5197d5f4314c372af35756c29905a070)
++++ b/tests/conftest.py	(date 1678286378709)
+@@ -1,5 +1,5 @@
+ import pytest
+-from src.Dataclass import Channel
++from src.channel import Channel
+ 
+ @pytest.fixture()
+ def channel1():
+Index: src/video.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/video.py b/src/video.py
+new file mode 100644
+--- /dev/null	(date 1678291262647)
++++ b/src/video.py	(date 1678291262647)
+@@ -0,0 +1,11 @@
++from src.channel import Channel
++
++class Video(Channel):
++    def __init__(self, channel_id:str):  # переопределяем метод базового класса
++        super().__init__(channel_id)
++
++
++
++
++video1 = Video('9lO06Zxhu88')
++
+Index: main.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from src.Dataclass import Channel\r\n\r\nchannel_vdud = Channel('UCMCgOm8GZkHp8zJ6l7_hIuA')  # id канала Вдудь\r\nchannel_news = Channel('UC1eFXmJNkjITxPFWTy6RsWg')  # id канала Редакции\r\n#channel_vdud .print_info() # информация о канале\r\n\r\n#print(channel_vdud.title)\r\n#print(channel_vdud.video_count)\r\n#print(channel_vdud.url)\r\n#channel_vdud.channel_id = 'new_id'\r\n#print(Channel.get_service())\r\n#channel_vdud.record_to_json('vdud.json')\r\n#print(channel_vdud.print_info())\r\n\r\nprint(channel_vdud)\r\nprint(channel_news)\r\n\r\nprint(channel_vdud > channel_news)\r\nprint(channel_vdud < channel_news)\r\nprint(channel_vdud + channel_news)\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main.py b/main.py
+--- a/main.py	(revision cf5103ec5197d5f4314c372af35756c29905a070)
++++ b/main.py	(date 1678290720483)
+@@ -1,4 +1,4 @@
+-from src.Dataclass import Channel
++from src.channel import Channel
+ 
+ channel_vdud = Channel('UCMCgOm8GZkHp8zJ6l7_hIuA')  # id канала Вдудь
+ channel_news = Channel('UC1eFXmJNkjITxPFWTy6RsWg')  # id канала Редакции
+Index: src/Dataclass.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/Dataclass.py b/src/channel.py
+rename from src/Dataclass.py
+rename to src/channel.py
+--- a/src/Dataclass.py	(revision cf5103ec5197d5f4314c372af35756c29905a070)
++++ b/src/channel.py	(date 1678291501831)
+@@ -8,7 +8,6 @@
+     youtube = build('youtube', 'v3', developerKey=api_key)  # специальный объект для работы с API
+ 
+     def __init__(self, channel_id: str):
+-        self._channel_id = None
+         self.__channel_id = channel_id  # id канала
+         self.channel = self.youtube.channels().list(id=channel_id,
+                                                     part='snippet,statistics').execute()  # данные о канале
+diff --git a/tests/test_dataclass.py b/tests/test_channel.py
+rename from tests/test_dataclass.py
+rename to tests/test_channel.py

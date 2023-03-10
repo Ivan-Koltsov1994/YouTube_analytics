@@ -1,0 +1,185 @@
+Index: tests/test_dataclass.py
+===================================================================
+diff --git a/tests/test_dataclass.py b/tests/test_dataclass.py
+deleted file mode 100644
+--- a/tests/test_dataclass.py	(revision b3d9fdc4ff77d94e68af20cda7580ad2f9a116fa)
++++ /dev/null	(revision b3d9fdc4ff77d94e68af20cda7580ad2f9a116fa)
+@@ -1,40 +0,0 @@
+-def test_str(channel1):
+-    """Тестируем метод __str__"""
+-    assert channel1.__str__() == "Youtube-канал: вДудь, подписчиков: 10300000"
+-
+-
+-def test_lt(channel1, channel2):
+-    """Тестируем метод __it__"""
+-    assert channel1.__lt__(channel2) is False
+-
+-
+-def test_add(channel1, channel2):
+-    """Тестируем метод __add__"""
+-    assert channel1.__add__(channel2) == 14000000
+-
+-
+-def test_len(channel1):
+-    """Тестируем метод __len__"""
+-    assert channel1.__len__() == 10300000
+-
+-
+-def test_repr(channel1):
+-    """Тестируем метод __repr__"""
+-    assert channel1.__repr__() == 'Youtube-канал: вДудь, id: UCMCgOm8GZkHp8zJ6l7_hIuA, подписчиков: 10300000'
+-
+-
+-def test_record_to_json(channel1):
+-    """Тестируем, что метод __record_to_json__ правильно записывает данные в json- формате"""
+-    channel1.record_to_json('v.json')
+-    assert open('v.json', 'r') is not None
+-
+-
+-def test_get_service(channel1):
+-    """Тестируем, что при выполнении метода получаем объект для работы с API вне класса"""
+-    assert channel1.get_service() is not None
+-
+-
+-def test_channel_id(channel1):
+-    """Тестируем, что метод channel_id.setter дает записывать данные в экземпляр класса"""
+-    channel1.channel_id = "12345"
+-    assert channel1.channel_id == "12345"
+Index: src/Dataclass.py
+===================================================================
+diff --git a/src/Dataclass.py b/src/Dataclass.py
+deleted file mode 100644
+--- a/src/Dataclass.py	(revision b3d9fdc4ff77d94e68af20cda7580ad2f9a116fa)
++++ /dev/null	(revision b3d9fdc4ff77d94e68af20cda7580ad2f9a116fa)
+@@ -1,77 +0,0 @@
+-import json
+-import os
+-from googleapiclient.discovery import build
+-
+-
+-class Channel:
+-    api_key: str = os.getenv('API_KEY')  # API_KEY скопирован из гугла
+-    youtube = build('youtube', 'v3', developerKey=api_key)  # специальный объект для работы с API
+-
+-    def __init__(self, channel_id: str):
+-        self.__channel_id = channel_id  # id канала
+-        self.channel = self.youtube.channels().list(id=channel_id,
+-                                                    part='snippet,statistics').execute()  # данные о канале
+-        self.title = self.channel['items'][0]['snippet']['title']  # название канала
+-        self.description = self.channel['items'][0]['snippet']['description']  # описание канала
+-        self.url = 'https://www.youtube.com/channel/' + self.__channel_id  # ссылка на канала
+-        self.subscribers = self.channel['items'][0]['statistics']['subscriberCount']  # количество подписчиков
+-        self.video_count = self.channel['items'][0]['statistics']['videoCount']  # количество видео
+-        self.view_count = self.channel['items'][0]['statistics']['viewCount']  # количество просмотров
+-
+-    def __repr__(self) -> str:
+-        """Метод возвращает информацию о экземпляре класса для разработчика"""
+-        return f'Youtube-канал: {self.title}, id: {self.__channel_id}, подписчиков: {self.subscribers}'
+-
+-    def __str__(self) -> str:
+-        """Метод возвращает информацию о экземпляре класса для пользователей"""
+-        return f'Youtube-канал: {self.title}, подписчиков: {self.subscribers}'
+-
+-    def __add__(self, other) -> int:
+-        """Метод скадывает каналы по кол-ву количество подписчиков"""
+-        if isinstance(other, Channel):
+-            return int(self.subscribers) + int(other.subscribers)
+-        else:
+-            raise ValueError('Неправильный формат')
+-
+-    def __lt__(self, other) -> int:
+-        """Метод сравнивает каналы по количеству подписчиков"""
+-        if isinstance(other, Channel):
+-            return self.subscribers > other.subscribers
+-        else:
+-            raise ValueError('Неправильный формат')
+-
+-    def __len__(self) -> int:
+-        """Метод возвращает количество подписчиков канала"""
+-        return int(self.subscribers)
+-
+-    @property
+-    def channel_id(self):
+-        """Метод запрещает внесение изменений в id канала"""
+-        return self.__channel_id
+-
+-    def print_info(self):
+-        """Метод возвращает общую информацию о YouTube канале"""
+-        print(json.dumps(self.channel, indent=2, ensure_ascii=False))
+-
+-    @classmethod
+-    def get_service(cls):
+-        """Метод получает объект для работы с API вне класса"""
+-        return cls.youtube
+-
+-    def record_to_json(self, filename):
+-        """метод сохраняет информацию по каналу, хранящуюся в атрибутах экземпляра класса Channel, в json-файл. """
+-        data = {
+-            'channel_id': self.__channel_id,
+-            'title': self.title,
+-            'description': self.description,
+-            'channel_link': self.url,
+-            'subscriber_count': self.subscribers,
+-            'video_count': self.video_count,
+-            'view_count': self.view_count
+-        }
+-        with open(filename, 'w', encoding='UTF-8') as file:
+-            json.dump(data, file, indent=2, ensure_ascii=False)
+-
+-    @channel_id.setter
+-    def channel_id(self, value):
+-        self.__channel_id = value
+Index: tests/conftest.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>import pytest\r\nfrom src.Dataclass import Channel\r\n\r\n@pytest.fixture()\r\ndef channel1():\r\n    return Channel('UCMCgOm8GZkHp8zJ6l7_hIuA')\r\n\r\n@pytest.fixture()\r\ndef channel2():\r\n    return Channel('UC1eFXmJNkjITxPFWTy6RsWg')\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/tests/conftest.py b/tests/conftest.py
+--- a/tests/conftest.py	(revision b3d9fdc4ff77d94e68af20cda7580ad2f9a116fa)
++++ b/tests/conftest.py	(date 1678291504242)
+@@ -1,5 +1,5 @@
+ import pytest
+-from src.Dataclass import Channel
++from src.channel import Channel
+ 
+ @pytest.fixture()
+ def channel1():
+Index: src/video.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/src/video.py b/src/video.py
+new file mode 100644
+--- /dev/null	(date 1678291504248)
++++ b/src/video.py	(date 1678291504248)
+@@ -0,0 +1,11 @@
++from src.channel import Channel
++
++class Video(Channel):
++    def __init__(self, channel_id:str):  # переопределяем метод базового класса
++        super().__init__(channel_id)
++
++
++
++
++video1 = Video('9lO06Zxhu88')
++
+Index: main.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from src.Dataclass import Channel\r\n\r\nchannel_vdud = Channel('UCMCgOm8GZkHp8zJ6l7_hIuA')  # id канала Вдудь\r\nchannel_news = Channel('UC1eFXmJNkjITxPFWTy6RsWg')  # id канала Редакции\r\n# channel_vdud .print_info() # информация о канале\r\n\r\n# print(channel_vdud.title)\r\n# print(channel_vdud.video_count)\r\n# print(channel_vdud.url)\r\n# channel_vdud.channel_id = 'new_id'\r\n# print(Channel.get_service())\r\n# channel_vdud.record_to_json('vdud.json')\r\nchannel_vdud.print_info()\r\n\r\nprint(channel_vdud)\r\nprint(channel_news)\r\n\r\nprint(channel_vdud > channel_news)\r\nprint(channel_vdud < channel_news)\r\nprint(channel_vdud + channel_news)\r\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/main.py b/main.py
+--- a/main.py	(revision b3d9fdc4ff77d94e68af20cda7580ad2f9a116fa)
++++ b/main.py	(date 1678291504254)
+@@ -1,4 +1,4 @@
+-from src.Dataclass import Channel
++from src.channel import Channel
+ 
+ channel_vdud = Channel('UCMCgOm8GZkHp8zJ6l7_hIuA')  # id канала Вдудь
+ channel_news = Channel('UC1eFXmJNkjITxPFWTy6RsWg')  # id канала Редакции
