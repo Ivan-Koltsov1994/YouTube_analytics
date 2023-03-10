@@ -8,7 +8,6 @@ class Channel:
     youtube = build('youtube', 'v3', developerKey=api_key)  # специальный объект для работы с API
 
     def __init__(self, channel_id: str):
-        self._channel_id = None
         self.__channel_id = channel_id  # id канала
         self.channel = self.youtube.channels().list(id=channel_id,
                                                     part='snippet,statistics').execute()  # данные о канале
