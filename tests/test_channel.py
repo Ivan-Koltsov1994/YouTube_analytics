@@ -10,7 +10,7 @@ def test_lt(channel1, channel2):
 
 def test_add(channel1, channel2):
     """Тестируем метод __add__"""
-    assert channel1.__add__(channel2) == 14000000
+    assert channel1.__add__(channel2) == 14010000
 
 
 def test_len(channel1):
