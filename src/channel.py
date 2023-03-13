@@ -4,6 +4,7 @@ from googleapiclient.discovery import build
 
 
 class Channel:
+    """Класс выводящий информацию о канале по id"""
     api_key: str = os.getenv('API_KEY')  # API_KEY скопирован из гугла
     youtube = build('youtube', 'v3', developerKey=api_key)  # специальный объект для работы с API
 
