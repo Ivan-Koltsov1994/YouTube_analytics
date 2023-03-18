@@ -3,6 +3,7 @@ import os
 
 import isodate as isodate
 from googleapiclient.discovery import build
+from src.errors import YoutubeApiError
 
 
 class Video:
@@ -12,12 +13,22 @@ class Video:
     youtube = build('youtube', 'v3', developerKey=api_key)  # специальный объект для работы с API
 
     def __init__(self, video_id: str):  # переопределяем метод базового класса
-        self.__video_id = video_id  # id видео
-        self.video = self.youtube.videos().list(id=video_id,
-                                                part='snippet,statistics').execute()  # данные о видео
-        self.title = self.video['items'][0]['snippet']['title']  # название видео
-        self.view_count = self.video['items'][0]['statistics']['viewCount']  # количество просмотров
-        self.likes_count = self.video['items'][0]['statistics']['likeCount']  # количество лайков
+        try:
+            self.__video_id = video_id  # id видео
+            self.video = self.youtube.videos().list(id=video_id,
+                                                    part='snippet,statistics').execute()  # данные о видео
+            if self.video['items']:
+                self.title = self.video['items'][0]['snippet']['title']  # название видео
+                self.view_count = self.video['items'][0]['statistics']['viewCount']  # количество просмотров
+                self.likes_count = self.video['items'][0]['statistics']['likeCount']  # количество лайков
+
+            else:
+                raise YoutubeApiError
+
+        except YoutubeApiError:
+            self.title = None
+            self.view_count = None
+            self.likes_count = None
 
     def __str__(self):
         return f'{self.title}'
@@ -35,7 +46,7 @@ class PLVideo(Video):
         self.__video_id = video_id  # id видео
         self.playlist = self.youtube.playlists().list(id=playlist_id,
                                                       part='snippet,contentDetails,status').execute()  # данные о
-        # плэйлисте
+        # плейлисте
         self.playlist_info = self.youtube.playlistItems().list(playlistId=playlist_id,
                                                                part='snippet,contentDetails,status').execute()  #
         # полные данные о плэйлисте
