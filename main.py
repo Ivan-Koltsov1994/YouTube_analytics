@@ -28,17 +28,21 @@ def main():
     # video2 = PLVideo('BBotskuyw_M', 'PLguYHBi01DWr4bRWc4uaguASmo7lW4GCb')
     # print(video2.__repr__())
 
-    pl = PlayList('PLguYHBi01DWr4bRWc4uaguASmo7lW4GCb')
-    print(pl.title_playlist)
-    print(pl.playlist_url)
+    #pl = PlayList('PLguYHBi01DWr4bRWc4uaguASmo7lW4GCb')
+    #print(pl.title_playlist)
+    #print(pl.playlist_url)
 
-    duration = pl.total_duration
-    print(duration)
+    #duration = pl.total_duration
+    #print(duration)
 
-    print(type(duration))
-    print(duration.total_seconds())
+    #print(type(duration))
+    #print(duration.total_seconds())
 
-    pl.show_best_video()
+    #pl.show_best_video()
+
+    broken_video = Video('broken_video_id')
+    print(broken_video.title)
+    print(broken_video.likes_count)
 
 
 if __name__ == '__main__':
